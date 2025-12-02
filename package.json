@@ -1,6 +1,6 @@
 {
   "name": "not-a-clue",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "Assistant for playing the game Clue",
   "private": true,
   "dependencies": {

@@ -1,6 +1,6 @@
 `
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 import React, { Component } from 'react';
 `
 

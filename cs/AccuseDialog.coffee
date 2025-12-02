@@ -2,23 +2,23 @@
 import PerCategoryCardChooser from './PerCategoryCardChooser'
 import PlayerChooser from './PlayerChooser'
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 class AccuseDialog extends Component
   constructor: (props) ->
-    super(props)
+    super props
     @state =
       accuserId: null
       cardIds:   {}
@@ -26,32 +26,35 @@ class AccuseDialog extends Component
     return
 
   close: ->
-    @setState({ accuserId: null, cardIds: {}, correct: null })
+    @setState
+      accuserId: null
+      cardIds: {}
+      correct: null
     @props.onClose()
     return
 
   stateIsOk: ->
-    cardCount = (key for key of @state.cardIds).length
-    @state.accuserId? and cardCount == 3 and @state.correct?
+    cardCount = Object.keys(@state.cardIds).length
+    return @state.accuserId? and cardCount == 3 and @state.correct?
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
   handleChangeAccuserId: (playerId) =>
-    @setState({ accuserId: playerId })
+    @setState { accuserId: playerId }
     return
 
   handleChangeCards: (typeId, cardId) =>
-    @setState((state, props) ->
+    @setState (state, props) ->
       newCardIds = Object.assign({}, state.cardIds)
       newCardIds[typeId] = cardId
-      { cardIds: newCardIds }
-    )
+      return { cardIds: newCardIds }
     return
 
   handleChangeOutcome: (event) =>
-    @setState({ correct: event.target.value })
+    @setState { correct: event.target.value }
     return
 
   handleCancel: =>
@@ -60,16 +63,16 @@ class AccuseDialog extends Component
 
   handleDone: =>
     if @stateIsOk()
-      cardIds = (cardId for typeId, cardId of @state.cardIds)
-      @props.onDone(@state.accuserId, cardIds, @state.correct == "yes")
+      cardIds = Object.values(@state.cardIds)
+      @props.onDone @state.accuserId, cardIds, @state.correct == "yes"
       @close()
     else
-      @props.app.showConfirmDialog("Error", "You must select an accuser, 3 cards, and the outcome.")
+      @props.app.showConfirmDialog "Error", "You must select an accuser, 3 cards, and the outcome."
     return
 
   render: ->
     { open, configuration, players } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record An Accusation</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Who made the accusation?</Typography>

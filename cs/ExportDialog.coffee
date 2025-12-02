@@ -1,23 +1,25 @@
 `
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Paper from '@material-ui/core/Paper';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Input from '@mui/material/Input';
 import React from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 ExportDialog = (props) ->
     { open, log, onClose } = props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={onClose}>
+    handleDialogClose = (event, reason) ->
+      return if reason is 'backdropClick'
+      onClose()
+
+    <Dialog open={open} fullScreen={true} onClose={handleDialogClose}>
       <DialogTitle id="form-dialog-title"> Export </DialogTitle>
       <DialogContent>
         <Typography component="h6"> Copy the JSON-formatted text below: </Typography>
-        <Paper>
-          <Typography component="pre"> {JSON.stringify(log)} </Typography>
-        </Paper>        
+        <Input autoFocus={true} fullWidth={true} multiline={true} value={JSON.stringify(log)} />
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="primary" onClick={onClose}> Done </Button>

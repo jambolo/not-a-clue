@@ -2,42 +2,45 @@
 import PlayerChooser from './PlayerChooser'
 import CardChooser from './CardChooser'
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 class ShowDialog extends Component
   constructor: (props) ->
-    super(props)
+    super props
     @state =
       playerId: null
-      cardId: null
+      cardId:   null
     return
 
   close: ->
-    @setState({ playerId: null, cardId: null })
+    @setState
+      playerId: null
+      cardId:   null
     @props.onClose()
     return
 
   stateIsOk: ->
     @state.playerId? and @state.cardId?
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
   handleChangePlayer: (playerId) =>
-    @setState({ playerId })
+    @setState { playerId }
     return
 
   handleChangeCard: (cardId) =>
-    @setState({ cardId })
+    @setState { cardId }
     return
 
   handleCancel: =>
@@ -46,15 +49,18 @@ class ShowDialog extends Component
     
   handleDone: =>
     if not @stateIsOk()
-      @props.app.showConfirmDialog("Error", "You must select a player and a card")
+      @props.app.showConfirmDialog(
+        "Error",
+        "You must select a player and a card"
+      )
       return
-    @props.onDone(@state.playerId, @state.cardId)
+    @props.onDone @state.playerId, @state.cardId
     @close()
     return
 
   render: ->
     { open, players, configuration } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record A Shown Card</DialogTitle>
       <DialogContent>
         <Typography variant="h4">Who showed the card?</Typography>

@@ -1,4 +1,6 @@
 `
+import Box from '@mui/material/Box'
+import CssBaseline from '@mui/material/CssBaseline'
 import Solver from './Solver'
 
 import AccuseDialog from './AccuseDialog'
@@ -14,7 +16,25 @@ import React, { Component } from 'react';
 import SetupDialog from './SetupDialog'
 import ShowDialog from './ShowDialog'
 import SuggestDialog from './SuggestDialog'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 `
+
+theme = createTheme
+  palette:
+    primary:
+      main: '#5E81F4'
+    secondary:
+      main: '#F97316'
+    background:
+      default: '#f6f8fb'
+  shape:
+    borderRadius: 14
+  typography:
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif'
+    h5:
+      fontWeight: 700
+    button:
+      textTransform: 'none'
 
 classic =
   name:       "Classic"
@@ -199,7 +219,7 @@ configurations =
 
 class App extends Component
   constructor: (props) ->
-    super(props)
+    super props
     @solver          = null
     @accusationId    = 1
     @commlinkId      = 1
@@ -234,13 +254,23 @@ class App extends Component
     @configurationId = configurationId
     @log             = []
 
-    @recordSetup(configurationId, playerIds)
+    @recordSetup configurationId, playerIds
     return
 
   importLog: (imported) =>
+    parsedLog = null
+    try
+      parsedLog = JSON.parse(imported)
+      
+    catch e
+      console.log(JSON.stringify(e, 2))
+      @showConfirmDialog(
+        "Import Error",
+        "The input is not valid JSON."
+      )
+      return
 
-    parsedLog = JSON.parse(imported)
-    if not parsedLog? or not parsedLog[0]? or not parsedLog[0].setup?
+    if not parsedLog? or parsedLog not instanceof Array or not parsedLog[0]? or not parsedLog[0].setup?
       @showConfirmDialog(
         "Import Error",
         "The first entry in the log is not a \"setup\" entry."
@@ -262,19 +292,18 @@ class App extends Component
     if not configurations[variation]?
       @showConfirmDialog(
         "Import Error",
-        "The variation \"#{variation}\" is not supported. The following variations are supported: #{v for v of configurations}"
+        "The variation \"#{variation}\" is not supported. The following variations are supported: #{Object.keys(configurations)}"
       )
       return
 
     configuration = configurations[variation]
 
-    if players.length < configuration.minPlayers or players.length > configuration.maxPlayers
+    if players not instanceof Array or players.length < configuration.minPlayers or players.length > configuration.maxPlayers
       @showConfirmDialog(
         "Import Error",
         "This variation requires #{configuration.minPlayers} to #{configuration.maxPlayers} players."
       )
       return
-
     if "ANSWER" in players or "Nobody" in players
       @showConfirmDialog(
         "Import Error",
@@ -285,11 +314,11 @@ class App extends Component
     configuration = configurations[variation]
 
     # Process the setup
-    @setUpNewGame(variation, players)
+    @setUpNewGame variation, players
 
     # Player and card lists for reporting errors
-    playerList = "#{p for p in players}"
-    cardList = "#{c for c of configuration.cards}"
+    playerList = "#{players}"
+    cardList = "#{Object.keys(configuration.cards)}"
 
     # Process each entry that follows
     for entry in parsedLog[1..]
@@ -309,7 +338,13 @@ class App extends Component
         if player not in players
           @showConfirmDialog(
             "Import Error",
-            "\"#{player}\" is not in the player list. Valid players are #{playerList}"
+            "\"#{player}\" is not in the list of players. Valid players are #{playerList}"
+          )
+          return
+        if cards not instanceof Array
+          @showConfirmDialog(
+            "Import Error",
+            "The hand.cards property must be an array of cards."
           )
           return
         for card in cards
@@ -320,7 +355,7 @@ class App extends Component
             )
             return
 
-        @recordHand(player, cards)
+        @recordHand player, cards
 
       # Suggest entry
       else if entry.suggest? 
@@ -337,7 +372,13 @@ class App extends Component
         if suggester not in players
           @showConfirmDialog(
             "Import Error",
-            "\"#{suggester}\" is not in the player list. Valid players are #{playerList}"
+            "\"#{suggester}\" is not in the list of players. Valid players are #{playerList}"
+          )
+          return
+        if cards not instanceof Array
+          @showConfirmDialog(
+            "Import Error",
+            "The suggest.cards property must be an array of cards."
           )
           return
         for c in cards
@@ -347,15 +388,21 @@ class App extends Component
               "\"#{c}\" is not in a valid card for this variation. Valid cards are #{cardList}"
             )
             return
+        if showed not instanceof Array
+          @showConfirmDialog(
+            "Import Error",
+            "The suggest.showed property must be an array of players."
+          )
+          return
         for s in showed
           if s not in players
             @showConfirmDialog(
               "Import Error",
-              "\"#{s}\" is not in the player list. Valid players are #{playerList}"
+              "\"#{s}\" is not in the list of players. Valid players are #{playerList}"
             )
             return
 
-        @recordSuggestion(suggester, cards, showed)
+        @recordSuggestion suggester, cards, showed
 
       # Show entry
       else if entry.show?
@@ -372,7 +419,7 @@ class App extends Component
         if player not in players
           @showConfirmDialog(
             "Import Error",
-            "\"#{player}\" is not in the player list. Valid players are #{playerList}"
+            "\"#{player}\" is not in the list of players. Valid players are #{playerList}"
           )
           return
         if not configuration.cards[card]?
@@ -382,13 +429,13 @@ class App extends Component
           )
           return
 
-        @recordShown(player, card)
+        @recordShown player, card
 
       # Accuse entry
       else if entry.accuse?
         accusation = entry.accuse
-        console.log(JSON.stringify(accusation))
-        console.log("")
+        console.log JSON.stringify(accusation)
+        console.log ""
         if not accusation.accuser? or not accusation.cards? or not accusation.correct?
           @showConfirmDialog(
             "Import Error",
@@ -404,6 +451,12 @@ class App extends Component
             "\"#{accuser}\" is not in the player list. Valid players are #{playerList}"
           )
           return
+        if cards not instanceof Array
+          @showConfirmDialog(
+            "Import Error",
+            "The accuse.cards property must be an array of cards."
+          )
+          return
         for c in cards
           if not configuration.cards[c]?
             @showConfirmDialog(
@@ -411,14 +464,14 @@ class App extends Component
               "\"#{c}\" is not in a valid card for this variation. Valid cards are #{cardList}"
             )
             return
-        if correct != Boolean(correct)
+        if typeof(correct) != typeof(true)
             @showConfirmDialog(
               "Import Error",
-              "The \"correct\" property must be true or false."
+              "The accuse.correct property must be true or false."
             )
             return
 
-        @recordAccusation(accuser, cards, correct)
+        @recordAccusation accuser, cards, correct
 
       # Commlink entry (if Star Wars edition)
       else if entry.commlink? and setup.variation is "star_wars"
@@ -444,6 +497,12 @@ class App extends Component
             "\"#{receiver}\" is not in the player list. Valid players are #{playerList}"
           )
           return
+        if cards not instanceof Array
+          @showConfirmDialog(
+            "Import Error",
+            "The commlink.cards property must be an array of cards."
+          )
+          return
         for c in cards
           if not configuration.cards[c]?
             @showConfirmDialog(
@@ -451,14 +510,14 @@ class App extends Component
               "\"#{c}\" is not in a valid card for this variation. Valid cards are #{cardList}"
             )
             return
-        if showed != Boolean(showed)
+        if typeof(showed) != typeof(true)
             @showConfirmDialog(
               "Import Error",
-              "The \"showed\" property must be true or false."
+              "The commlink.showed property must be true or false."
             )
             return
 
-        @recordCommlink(caller, receiver, cards, showed)
+        @recordCommlink caller, receiver, cards, showed
 
       # Otherwise, unknown entry
       else
@@ -473,224 +532,220 @@ class App extends Component
   # Component launchers
 
   showMainMenu: (anchor) =>
-    @setState({ mainMenuAnchor: anchor })
+    @setState { mainMenuAnchor: anchor }
     return
 
   showNewGameDialog: =>
-    @setState({ newGameDialogOpen: true })
+    @setState { newGameDialogOpen: true }
     return
 
   showImportDialog: =>
-    @setState({ importDialogOpen: true })
+    @setState { importDialogOpen: true }
     return
 
   showLog: =>
-    @setState({ logDialogOpen: true })
+    @setState { logDialogOpen: true }
     return
 
   showExportDialog: =>
-    @setState({ exportDialogOpen: true })
+    @setState { exportDialogOpen: true }
     return
 
   showConfirmDialog: (title, question, yesAction, noAction) =>
-    @setState({ 
+    @setState 
       confirmDialog:
         open: true
         title: title
         question: question
         yesAction: yesAction
         noAction: noAction
-    })
     return
 
   showHandDialog: =>
-    @setState({ handDialogOpen: true })
+    @setState { handDialogOpen: true }
     return
 
   showSuggestDialog: =>
-    @setState({ suggestDialogOpen: true })
+    @setState { suggestDialogOpen: true }
     return
 
   showShowDialog: =>
-    @setState({ showDialogOpen: true })
+    @setState { showDialogOpen: true }
     return
 
   showAccuseDialog: =>
-    @setState({ accuseDialogOpen: true })
+    @setState { accuseDialogOpen: true }
     return
 
   showCommlinkDialog: =>
-    @setState({ commlinkDialogOpen: true })
+    @setState { commlinkDialogOpen: true }
     return
 
   # Solver state updaters
 
   recordSetup: (configurationId, playerIds) =>
     @solver = new Solver(configurations[configurationId], playerIds)
-    @log.push({ 
+    @log.push 
       setup:
         variation: configurationId
         players:   playerIds
-    })
 
   recordHand: (playerId, cardIds) =>
     if @solver?
-      @solver.hand(playerId, cardIds) 
-      @log.push({
+      @solver.hand playerId, cardIds
+      @log.push
         hand:
           player: playerId
           cards:  cardIds
-      })
     return
 
   recordSuggestion: (suggesterId, cardIds, showedIds) =>
     if @solver?
       id = @suggestionId++
-      @solver.suggest(suggesterId, cardIds, showedIds, id)
-      @log.push({
+      @solver.suggest suggesterId, cardIds, showedIds, id
+      @log.push
         suggest:
           id:        id
           suggester: suggesterId
           cards:     cardIds
           showed:    showedIds
-      })
     return
 
   recordShown: (playerId, cardId) =>
     if @solver?
-      @solver.show(playerId, cardId)
-      @log.push({
+      @solver.show playerId, cardId
+      @log.push
         show:
             player: playerId
             card:   cardId
-      })
     return
 
   recordAccusation: (accuserId, cardIds, correct) =>
     if @solver?
       id = @accusationId++
-      @solver.accuse(accuserId, cardIds, correct, id)
-      @log.push({
+      @solver.accuse accuserId, cardIds, correct, id
+      @log.push
         accuse:
           id:      id
           accuser: accuserId
           cards:   cardIds
           correct: correct
-      })
     return
 
   recordCommlink: (callerId, receiverId, cardIds, showed) =>
     if @solver?
       id = @commlinkId++
-      @solver.commlink(callerId, receiverId, cardIds, showed, id)
-      @log.push({
+      @solver.commlink callerId, receiverId, cardIds, showed, id
+      @log.push
         commlink:
           id:       id
           caller:   callerId
           receiver: receiverId
           cards:    cardIds
           showed:   showed
-      })
     return
 
   render: ->
-    <div className="App">
-      <MainView configurationId={@configurationId} solver={@solver} onMenu={@showMainMenu} app={this} />
-      <MainMenu
-        anchor={@state.mainMenuAnchor}
-        started={@solver?}
-        onClose={() => @setState({ mainMenuAnchor: null })}
-        app={this}
-      />
-      <SetupDialog
-        open={@state.newGameDialogOpen}
-        configurations={configurations}
-        onDone={@setUpNewGame}
-        onClose={() => @setState({ newGameDialogOpen: false })}
-        app={this}
-      />
-      <ImportDialog
-        open={@state.importDialogOpen}
-        configurations={configurations}
-        onDone={@importLog}
-        onClose={() => @setState({ importDialogOpen: false })}
-        app={this}
-      />
-      <LogDialog
-        open={@state.logDialogOpen}
-        log={@log}
-        configurations={configurations}
-        onClose={() => @setState({ logDialogOpen: false })}
-        app={this}
-      />
-      <ExportDialog
-        open={@state.exportDialogOpen}
-        log={@log}
-        onClose={() => @setState({ exportDialogOpen: false })}
-        app={this}
-      />
-      <ConfirmDialog
-        open={@state.confirmDialog.open}
-        title={@state.confirmDialog.title}
-        question={@state.confirmDialog.question}
-        yesAction={@state.confirmDialog.yesAction}
-        noAction={@state.confirmDialog.noAction}
-        onClose={@handleConfirmDialogClose}
-        app={this}
-      />
-      <HandDialog
-        open={@state.handDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordHand}
-        onClose={() => @setState({ handDialogOpen: false })}
-        app={this}
-      />
-      <SuggestDialog
-        open={@state.suggestDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordSuggestion}
-        onClose={() => @setState({ suggestDialogOpen: false })}
-        app={this}
-      />
-      <ShowDialog
-        open={@state.showDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordShown}
-        onClose={() => @setState({ showDialogOpen: false })}
-        app={this}
-      />
-      <AccuseDialog
-        open={@state.accuseDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordAccusation}
-        onClose={() => @setState({ accuseDialogOpen: false })}
-        app={this}
-      />
-      <CommlinkDialog
-        open={@state.commlinkDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordCommlink}
-        onClose={() => @setState({ commlinkDialogOpen: false })}
-        app={this}
-      />
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box className="App" sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <MainView configurationId={@configurationId} solver={@solver} onMenu={@showMainMenu} app={this} />
+        <MainMenu
+          anchor={@state.mainMenuAnchor}
+          started={@solver?}
+          onClose={() => @setState({ mainMenuAnchor: null })}
+          app={this}
+        />
+        <SetupDialog
+          open={@state.newGameDialogOpen}
+          configurations={configurations}
+          onDone={@setUpNewGame}
+          onClose={() => @setState({ newGameDialogOpen: false })}
+          app={this}
+        />
+        <ImportDialog
+          open={@state.importDialogOpen}
+          configurations={configurations}
+          onDone={@importLog}
+          onClose={() => @setState({ importDialogOpen: false })}
+          app={this}
+        />
+        <LogDialog
+          open={@state.logDialogOpen}
+          log={@log}
+          configurations={configurations}
+          onClose={() => @setState({ logDialogOpen: false })}
+          app={this}
+        />
+        <ExportDialog
+          open={@state.exportDialogOpen}
+          log={@log}
+          onClose={() => @setState({ exportDialogOpen: false })}
+          app={this}
+        />
+        <ConfirmDialog
+          open={@state.confirmDialog.open}
+          title={@state.confirmDialog.title}
+          question={@state.confirmDialog.question}
+          yesAction={@state.confirmDialog.yesAction}
+          noAction={@state.confirmDialog.noAction}
+          onClose={@handleConfirmDialogClose}
+          app={this}
+        />
+        <HandDialog
+          open={@state.handDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordHand}
+          onClose={() => @setState({ handDialogOpen: false })}
+          app={this}
+        />
+        <SuggestDialog
+          open={@state.suggestDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordSuggestion}
+          onClose={() => @setState({ suggestDialogOpen: false })}
+          app={this}
+        />
+        <ShowDialog
+          open={@state.showDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordShown}
+          onClose={() => @setState({ showDialogOpen: false })}
+          app={this}
+        />
+        <AccuseDialog
+          open={@state.accuseDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordAccusation}
+          onClose={() => @setState({ accuseDialogOpen: false })}
+          app={this}
+        />
+        <CommlinkDialog
+          open={@state.commlinkDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordCommlink}
+          onClose={() => @setState({ commlinkDialogOpen: false })}
+          app={this}
+        />
+      </Box>
+    </ThemeProvider>
 
   # Callbacks
   
   handleConfirmDialogClose: =>
-    @setState({ 
+    @setState { 
       confirmDialog: 
         open:      false
         title:     ""
         question:  ""
         yesAction: null
         noAction:  null 
-    })
+    }
     return
 
 

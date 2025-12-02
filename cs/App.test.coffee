@@ -1,11 +1,12 @@
 `
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 `
 
-it 'renders without crashing', => 
+it 'renders without crashing', =>
   div = document.createElement 'div'
-  ReactDOM.render <App />, div
-  ReactDOM.unmountComponentAtNode div
+  root = createRoot div
+  root.render <App />
+  root.unmount()
   return

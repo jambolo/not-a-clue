@@ -1,11 +1,11 @@
 `
-import AppBar from '@material-ui/core/AppBar';
-import Checkbox from '@material-ui/core/Checkbox';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup';
+import AppBar from '@mui/material/AppBar';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
 import React, { Component } from 'react';
-import Tab from '@material-ui/core/Tab';
-import Tabs from '@material-ui/core/Tabs';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 `
 
 GroupedCardList = (props) ->
@@ -28,7 +28,8 @@ CardList = (props) ->
 
 class CardChoices extends Component
   makeChangeHandler: (id) =>
-    (event) => @props.onChange(id, event.target.checked)
+    (event) =>
+      @props.onChange id, event.target.checked
 
   render: ->
     { value, cards, excluded, type } = @props
@@ -52,18 +53,18 @@ class CardChoices extends Component
 
 class MultipleCardChooser extends Component
   constructor: (props) ->
-    super(props)
+    super props
     @state =
       currentTab: 0
     return
 
   handleChangeTab: (event, currentTab) =>
-    @setState({ currentTab });
+    @setState { currentTab }
     return
 
   render: ->
     { value, cards, types, excluded, onChange } = @props
-    tabIds = (id for id of types)
+    tabIds = Object.keys(types)
     tabIndex = if @state.currentTab >= 0 and @state.currentTab < tabIds.length then @state.currentTab else 0
     tabId = tabIds[tabIndex]
 

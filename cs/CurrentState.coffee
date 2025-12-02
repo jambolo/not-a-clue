@@ -82,7 +82,7 @@ CurrentState = (props) ->
   [query, setQuery] = React.useState("")
   [showOnlyUnknown, setShowOnlyUnknown] = React.useState(false)
 
-  normalizedCards = Object.entries(cards).map(([id, card]) -> Object.assign({ id }, card))
+  normalizedCards = Object.entries(cards).map(([id, card]) -> Object.assign(card, { id }))
 
   filteredCards = React.useMemo(() ->
     list = normalizedCards.filter((c) -> c.info.name.toLowerCase().includes(query.toLowerCase()))

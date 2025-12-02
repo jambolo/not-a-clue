@@ -61,7 +61,7 @@ class LogDialog extends Component
   describeHand: (info) -> "#{info.player} has #{cardList(info.cards, @configuration)}."
 
   describeSuggest: (info) ->
-    if @configuration.rules is "master"
+    if @configuration.rulesId is "master"
       @describeSuggestMaster info
     else
       @describeSuggestClassic info

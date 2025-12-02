@@ -13,26 +13,39 @@ import RadioGroup from '@mui/material/RadioGroup';
 import React, { Component } from 'react';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert'
 `
 ConfigurationChoices = (props) ->
   { choice, configurations, numPlayers, onChange } = props
 
-  <RadioGroup row name="variations" value={choice} onChange={onChange}>
+  <Stack spacing={1}>
     {
       for id, configuration of configurations
-        <FormControlLabel 
-          key={id} 
-          value={id} 
-          control={<Radio /> } 
-          label={configuration.name}
-          disabled={configuration.maxPlayers < numPlayers}
-        /> 
+        <Paper key={id} variant={if choice is id then 'outlined' else 'elevation'} sx={{ p: 2, borderColor: if choice is id then 'primary.main' else undefined }}>
+          <FormControlLabel
+            value={id}
+            control={<Radio checked={choice is id} onChange={onChange} /> }
+            label=
+              <Stack spacing={0.5}>
+                <Typography variant="subtitle1" fontWeight={600}>{configuration.name}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {configuration.minPlayers} - {configuration.maxPlayers} players · {Object.keys(configuration.cards).length} cards
+                </Typography>
+              </Stack>
+            disabled={configuration.maxPlayers < numPlayers}
+          />
+        </Paper>
     }
-  </RadioGroup>
+  </Stack>
 
 ConfigurationChooser = (props) ->
-  <FormControl component="fieldset">
-    <FormLabel component="legend"><Typography variant="h6">Select a variation:</Typography></FormLabel>
+  <FormControl component="fieldset" fullWidth>
+    <FormLabel component="legend"><Typography variant="h6">Select a variation</Typography></FormLabel>
+    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+      Choose the rule set that matches your board. Options that cannot support your player count are disabled.
+    </Typography>
     <ConfigurationChoices
       choice={props.choice}
       configurations={props.configurations}
@@ -71,17 +84,20 @@ class AddPlayerInput extends Component
 
   render: ->
     <div>
-      <TextField 
-        autoFocus 
-        margin="normal" 
-        value={@state.playerId} 
+      <TextField
+        autoFocus
+        margin="normal"
+        label="Player name"
+        placeholder="Enter a unique name"
+        value={@state.playerId}
         onChange={@handleChange}
-        onKeyDown={@handleKeyDown} 
+        onKeyDown={@handleKeyDown}
+        helperText="Press Enter to add quickly"
       />
-      <Button 
-        disabled={@props.count >= @props.max} 
-        variant="contained" 
-        color="primary" 
+      <Button
+        disabled={@props.count >= @props.max}
+        variant="contained"
+        color="primary"
         onClick={@handleAddPlayer}
       >
         Add
@@ -149,32 +165,43 @@ class SetupDialog extends Component
 
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">New Game</DialogTitle>
-      <DialogContent>
-        <ConfigurationChooser
-          choice={@state.configurationId}
-          configurations={configurations}
-          numPlayers={numPlayers}
-          onChange={@handleChangeConfiguration}
-        />
-        <Divider />
-        <Typography variant="h6">{ if maxPlayers > 0 then "Add up to #{maxPlayers} players:" else "Add players:"}</Typography>
-        <AddPlayers
-          players={@state.playerIds}
-          max={maxPlayers}
-          app={app}
-          onAddPlayer={@handleAddPlayer}
-          onClearPlayers={@handleClearPlayers}
-        />
+      <DialogContent dividers sx={{ bgcolor: 'background.default' }}>
+        <Stack spacing={3}>
+          <ConfigurationChooser
+            choice={@state.configurationId}
+            configurations={configurations}
+            numPlayers={numPlayers}
+            onChange={@handleChangeConfiguration}
+          />
+          <Divider />
+          <Stack spacing={1}>
+            <Typography variant="h6">{ if maxPlayers > 0 then "Add up to #{maxPlayers} players" else "Add players"}</Typography>
+            <Typography variant="body2" color="text.secondary">Player names must be unique and cannot use the reserved word ANSWER.</Typography>
+            <AddPlayers
+              players={@state.playerIds}
+              max={maxPlayers}
+              app={app}
+              onAddPlayer={@handleAddPlayer}
+              onClearPlayers={@handleClearPlayers}
+            />
+            {
+              if maxPlayers > 0
+                <Alert severity={if numPlayers < minPlayers then 'info' else 'success'}>
+                  {numPlayers} of {minPlayers}–{maxPlayers} players added.
+                </Alert>
+            }
+          </Stack>
+        </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button variant="contained" color="primary" onClick={@handleCancel}>Cancel</Button>
-        <Button 
-          disabled={not @state.configurationId? or numPlayers < minPlayers} 
-          variant="contained" 
-          color="primary" 
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button variant="outlined" color="primary" onClick={@handleCancel}>Cancel</Button>
+        <Button
+          disabled={not @state.configurationId? or numPlayers < minPlayers}
+          variant="contained"
+          color="primary"
           onClick={@handleDone}
         >
-          Done
+          Start game
         </Button>
       </DialogActions>
     </Dialog>

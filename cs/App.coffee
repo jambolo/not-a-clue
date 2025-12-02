@@ -1,4 +1,6 @@
 `
+import Box from '@mui/material/Box'
+import CssBaseline from '@mui/material/CssBaseline'
 import Solver from './Solver'
 
 import AccuseDialog from './AccuseDialog'
@@ -14,7 +16,25 @@ import React, { Component } from 'react';
 import SetupDialog from './SetupDialog'
 import ShowDialog from './ShowDialog'
 import SuggestDialog from './SuggestDialog'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 `
+
+theme = createTheme
+  palette:
+    primary:
+      main: '#5E81F4'
+    secondary:
+      main: '#F97316'
+    background:
+      default: '#f6f8fb'
+  shape:
+    borderRadius: 14
+  typography:
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif'
+    h5:
+      fontWeight: 700
+    button:
+      textTransform: 'none'
 
 classic =
   name:       "Classic"
@@ -626,91 +646,94 @@ class App extends Component
     return
 
   render: ->
-    <div className="App">
-      <MainView configurationId={@configurationId} solver={@solver} onMenu={@showMainMenu} app={this} />
-      <MainMenu
-        anchor={@state.mainMenuAnchor}
-        started={@solver?}
-        onClose={() => @setState({ mainMenuAnchor: null })}
-        app={this}
-      />
-      <SetupDialog
-        open={@state.newGameDialogOpen}
-        configurations={configurations}
-        onDone={@setUpNewGame}
-        onClose={() => @setState({ newGameDialogOpen: false })}
-        app={this}
-      />
-      <ImportDialog
-        open={@state.importDialogOpen}
-        configurations={configurations}
-        onDone={@importLog}
-        onClose={() => @setState({ importDialogOpen: false })}
-        app={this}
-      />
-      <LogDialog
-        open={@state.logDialogOpen}
-        log={@log}
-        configurations={configurations}
-        onClose={() => @setState({ logDialogOpen: false })}
-        app={this}
-      />
-      <ExportDialog
-        open={@state.exportDialogOpen}
-        log={@log}
-        onClose={() => @setState({ exportDialogOpen: false })}
-        app={this}
-      />
-      <ConfirmDialog
-        open={@state.confirmDialog.open}
-        title={@state.confirmDialog.title}
-        question={@state.confirmDialog.question}
-        yesAction={@state.confirmDialog.yesAction}
-        noAction={@state.confirmDialog.noAction}
-        onClose={@handleConfirmDialogClose}
-        app={this}
-      />
-      <HandDialog
-        open={@state.handDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordHand}
-        onClose={() => @setState({ handDialogOpen: false })}
-        app={this}
-      />
-      <SuggestDialog
-        open={@state.suggestDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordSuggestion}
-        onClose={() => @setState({ suggestDialogOpen: false })}
-        app={this}
-      />
-      <ShowDialog
-        open={@state.showDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordShown}
-        onClose={() => @setState({ showDialogOpen: false })}
-        app={this}
-      />
-      <AccuseDialog
-        open={@state.accuseDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordAccusation}
-        onClose={() => @setState({ accuseDialogOpen: false })}
-        app={this}
-      />
-      <CommlinkDialog
-        open={@state.commlinkDialogOpen}
-        configuration={configurations[@configurationId]}
-        players={@playerIds}
-        onDone={@recordCommlink}
-        onClose={() => @setState({ commlinkDialogOpen: false })}
-        app={this}
-      />
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box className="App" sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+        <MainView configurationId={@configurationId} solver={@solver} onMenu={@showMainMenu} app={this} />
+        <MainMenu
+          anchor={@state.mainMenuAnchor}
+          started={@solver?}
+          onClose={() => @setState({ mainMenuAnchor: null })}
+          app={this}
+        />
+        <SetupDialog
+          open={@state.newGameDialogOpen}
+          configurations={configurations}
+          onDone={@setUpNewGame}
+          onClose={() => @setState({ newGameDialogOpen: false })}
+          app={this}
+        />
+        <ImportDialog
+          open={@state.importDialogOpen}
+          configurations={configurations}
+          onDone={@importLog}
+          onClose={() => @setState({ importDialogOpen: false })}
+          app={this}
+        />
+        <LogDialog
+          open={@state.logDialogOpen}
+          log={@log}
+          configurations={configurations}
+          onClose={() => @setState({ logDialogOpen: false })}
+          app={this}
+        />
+        <ExportDialog
+          open={@state.exportDialogOpen}
+          log={@log}
+          onClose={() => @setState({ exportDialogOpen: false })}
+          app={this}
+        />
+        <ConfirmDialog
+          open={@state.confirmDialog.open}
+          title={@state.confirmDialog.title}
+          question={@state.confirmDialog.question}
+          yesAction={@state.confirmDialog.yesAction}
+          noAction={@state.confirmDialog.noAction}
+          onClose={@handleConfirmDialogClose}
+          app={this}
+        />
+        <HandDialog
+          open={@state.handDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordHand}
+          onClose={() => @setState({ handDialogOpen: false })}
+          app={this}
+        />
+        <SuggestDialog
+          open={@state.suggestDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordSuggestion}
+          onClose={() => @setState({ suggestDialogOpen: false })}
+          app={this}
+        />
+        <ShowDialog
+          open={@state.showDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordShown}
+          onClose={() => @setState({ showDialogOpen: false })}
+          app={this}
+        />
+        <AccuseDialog
+          open={@state.accuseDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordAccusation}
+          onClose={() => @setState({ accuseDialogOpen: false })}
+          app={this}
+        />
+        <CommlinkDialog
+          open={@state.commlinkDialogOpen}
+          configuration={configurations[@configurationId]}
+          players={@playerIds}
+          onDone={@recordCommlink}
+          onClose={() => @setState({ commlinkDialogOpen: false })}
+          app={this}
+        />
+      </Box>
+    </ThemeProvider>
 
   # Callbacks
   

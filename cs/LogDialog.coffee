@@ -5,6 +5,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import React, { Component } from 'react';
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 `
 
 cardPhrase = (card, configuration, usePreposition = true) ->
@@ -48,6 +53,7 @@ class LogDialog extends Component
   constructor: (props) ->
     super props
     @configuration = null
+    @state = { query: "" }
     return
 
   describeSetup: (info) -> "Playing #{@configuration.name} with #{playerList(info.players)}."
@@ -110,14 +116,37 @@ class LogDialog extends Component
       return if reason is 'backdropClick'
       onClose()
 
+    filteredLog = log.filter((entry) =>
+      description = @describeEntry(entry)
+      description.toLowerCase().includes(@state.query.toLowerCase())
+    )
+
     <Dialog open={open} fullScreen={true} onClose={handleDialogClose}>
-      <DialogTitle id="form-dialog-title">Log</DialogTitle>
-      <DialogContent>
-        <ol>
-          {<li key={step}> {@describeEntry(entry)} </li> for entry, step in log}
-        </ol>
+      <DialogTitle id="form-dialog-title">Session log</DialogTitle>
+      <DialogContent dividers>
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="subtitle1">Search and filter</Typography>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Search by player or card"
+              value={@state.query}
+              onChange={(event) => @setState({ query: event.target.value })}
+            />
+          </Box>
+          <Divider />
+          {
+            if filteredLog.length > 0
+              <ol>
+                {<li key={step}> {@describeEntry(entry)} </li> for entry, step in filteredLog}
+              </ol>
+            else
+              <Typography color="text.secondary">No log entries match your search.</Typography>
+          }
+        </Stack>
      </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ px: 3, py: 2 }}>
         <Button variant="contained" color="primary" onClick={onClose}> Done </Button>
       </DialogActions>
     </Dialog>

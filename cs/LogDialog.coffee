@@ -12,6 +12,15 @@ import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 `
 
+PlayerName = ({ name }) ->
+  <Typography component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>{name}</Typography>
+
+CardName = ({ name }) ->
+  <Typography component="span" sx={{ fontWeight: 700, color: 'secondary.main', fontStyle: 'italic' }}>{name}</Typography>
+
+VariationName = ({ name }) ->
+  <Typography component="span" sx={{ fontWeight: 700, color: 'info.main', letterSpacing: 0.5 }}>{name}</Typography>
+
 cardPhrase = (card, configuration, usePreposition = true) ->
   type = configuration.types[card.type]
   phrase = ""
@@ -19,6 +28,14 @@ cardPhrase = (card, configuration, usePreposition = true) ->
   phrase += type.article
   phrase += card.name
   return phrase
+
+cardPhraseNode = (card, configuration, usePreposition = true) ->
+  type = configuration.types[card.type]
+  <React.Fragment>
+    {if usePreposition then type.preposition else ""}
+    {type.article}
+    <CardName name={card.name} />
+  </React.Fragment>
 
 transcribedList = (list) ->
   string = list[0]
@@ -31,12 +48,34 @@ transcribedList = (list) ->
       string += " and " + list[1]
   return string
 
+transcribedListNodes = (list) ->
+  return "Nobody" if list.length == 0
+  result = []
+  for item, idx in list
+    result.push item
+    if idx < list.length - 2
+      result.push ", "
+    else if idx is list.length - 2
+      result.push if list.length > 2 then ", and " else " and "
+  return result
+
 playerList = (playerIds) -> if playerIds.length > 0 then transcribedList(playerIds) else "Nobody"
+
+playerListNodes = (playerIds) ->
+  if playerIds.length > 0
+    transcribedListNodes(<PlayerName name={id} /> for id in playerIds)
+  else
+    "Nobody"
 
 cardList = (cardIds, configuration) ->
   cards = configuration.cards
   names = (cardPhrase(cards[id], configuration, false) for id in cardIds)
   return transcribedList(names)
+
+cardListNodes = (cardIds, configuration) ->
+  cards = configuration.cards
+  names = (cardPhraseNode(cards[id], configuration, false) for id in cardIds)
+  return transcribedListNodes(names)
 
 suggestedCardsClause = (cardIds, configuration) ->
   cards = configuration.cards
@@ -49,6 +88,20 @@ suggestedCardsClause = (cardIds, configuration) ->
   clause += cardPhrase(card3, configuration)
   return clause
 
+suggestedCardsClauseNodes = (cardIds, configuration) ->
+  cards = configuration.cards
+  suggestionOrder = configuration.suggestionOrder
+  card1 = (cards[id] for id in cardIds when cards[id].type is suggestionOrder[0])[0]
+  card2 = (cards[id] for id in cardIds when cards[id].type is suggestionOrder[1])[0]
+  card3 = (cards[id] for id in cardIds when cards[id].type is suggestionOrder[2])[0]
+  [
+    cardPhraseNode(card1, configuration)
+    " "
+    cardPhraseNode(card2, configuration)
+    " "
+    cardPhraseNode(card3, configuration)
+  ]
+
 class LogDialog extends Component
   constructor: (props) ->
     super props
@@ -56,9 +109,28 @@ class LogDialog extends Component
     @state = { query: "" }
     return
 
-  describeSetup: (info) -> "Playing #{@configuration.name} with #{playerList(info.players)}."
+  describeSetup: (info) ->
+    text = "Playing #{@configuration.name} with #{playerList(info.players)}."
+    nodes =
+      <React.Fragment>
+        {"Playing "}
+        <VariationName name={@configuration.name} />
+        {" with "}
+        {playerListNodes(info.players)}
+        {"."}
+      </React.Fragment>
+    { text, nodes }
 
-  describeHand: (info) -> "#{info.player} has #{cardList(info.cards, @configuration)}."
+  describeHand: (info) ->
+    text = "#{info.player} has #{cardList(info.cards, @configuration)}."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.player} />
+        {" has "}
+        {cardListNodes(info.cards, @configuration)}
+        {"."}
+      </React.Fragment>
+    { text, nodes }
 
   describeSuggest: (info) ->
     if @configuration.rulesId is "master"
@@ -67,8 +139,17 @@ class LogDialog extends Component
       @describeSuggestClassic info
 
   describeSuggestMaster: (info) ->
-    "#{info.suggester} suggested: #{suggestedCardsClause(info.cards, @configuration)}.
-     #{playerList(info.showed)} showed a card."
+    text = "#{info.suggester} suggested: #{suggestedCardsClause(info.cards, @configuration)}. #{playerList(info.showed)} showed a card."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.suggester} />
+        {" suggested: "}
+        {suggestedCardsClauseNodes(info.cards, @configuration)}
+        {". "}
+        {playerListNodes(info.showed)}
+        {" showed a card."}
+      </React.Fragment>
+    { text, nodes }
 
   describeSuggestClassic: (info) ->
     description = "#{info.suggester} suggested #{suggestedCardsClause(info.cards, @configuration)}."
@@ -78,19 +159,72 @@ class LogDialog extends Component
       description += " #{info.showed[info.showed.length-1]} showed a card."
     else
       description += " Nobody showed a card."
-    return description
+    detailNodes =
+      if info.showed.length > 0
+        if info.showed.length > 1
+          [
+            " "
+            playerListNodes(info.showed[0...-1])
+            " did not show a card. "
+            <PlayerName name={info.showed[info.showed.length-1]} />
+            " showed a card."
+          ]
+        else
+          [
+            " "
+            <PlayerName name={info.showed[0]} />
+            " showed a card."
+          ]
+      else
+        " Nobody showed a card."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.suggester} />
+        {" suggested "}
+        {suggestedCardsClauseNodes(info.cards, @configuration)}
+        {"."}
+        {detailNodes}
+      </React.Fragment>
+    { text: description, nodes }
 
   describeShow: (info) ->
     cards = @configuration.cards
-    return "#{info.player} showed #{cardPhrase(cards[info.card], @configuration, false)}."
+    text = "#{info.player} showed #{cardPhrase(cards[info.card], @configuration, false)}."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.player} />
+        {" showed "}
+        {cardPhraseNode(cards[info.card], @configuration, false)}
+        {"."}
+      </React.Fragment>
+    { text, nodes }
 
   describeAccuse: (info) ->
-    "#{info.accuser} made an accusation: #{suggestedCardsClause(info.cards, @configuration)}.
-     The accusation was #{if info.correct then "" else "not "}correct."
+    text = "#{info.accuser} made an accusation: #{suggestedCardsClause(info.cards, @configuration)}. The accusation was #{if info.correct then "" else "not "}correct."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.accuser} />
+        {" made an accusation: "}
+        {suggestedCardsClauseNodes(info.cards, @configuration)}
+        {". The accusation was "}
+        {if info.correct then "correct." else "not correct."}
+      </React.Fragment>
+    { text, nodes }
 
-   describeCommlink: (info) ->
-    "#{info.caller} asked #{info.receiver} about #{suggestedCardsClause(info.cards, @configuration)}.
-     #{info.subject} #{if info.showed then "showed" else "did not show"} a card."
+  describeCommlink: (info) ->
+    text = "#{info.caller} asked #{info.receiver} about #{suggestedCardsClause(info.cards, @configuration)}. #{info.receiver} #{if info.showed then "showed" else "did not show"} a card."
+    nodes =
+      <React.Fragment>
+        <PlayerName name={info.caller} />
+        {" asked "}
+        <PlayerName name={info.receiver} />
+        {" about "}
+        {suggestedCardsClauseNodes(info.cards, @configuration)}
+        {". "}
+        <PlayerName name={info.receiver} />
+        {" #{if info.showed then "showed" else "did not show"} a card."}
+      </React.Fragment>
+    { text, nodes }
 
   describeEntry: (entry) ->
     if entry.setup?
@@ -107,6 +241,7 @@ class LogDialog extends Component
       @describeCommlink entry.commlink
     else
       alert "Unknown log entry"
+      { text: "Unknown log entry", nodes: "Unknown log entry" }
 
   render: ->
     { open, log, configurations, onClose } = @props
@@ -116,10 +251,14 @@ class LogDialog extends Component
       return if reason is 'backdropClick'
       onClose()
 
-    filteredLog = log.filter((entry) =>
-      description = @describeEntry(entry)
-      description.toLowerCase().includes(@state.query.toLowerCase())
-    )
+    filteredLog = log
+      .map((entry) =>
+        description = @describeEntry(entry)
+        { entry, description }
+      )
+      .filter((item) =>
+        item.description.text.toLowerCase().includes(@state.query.toLowerCase())
+      )
 
     <Dialog open={open} fullScreen={true} onClose={handleDialogClose}>
       <DialogTitle id="form-dialog-title">Session log</DialogTitle>
@@ -139,7 +278,7 @@ class LogDialog extends Component
           {
             if filteredLog.length > 0
               <ol>
-                {<li key={step}> {@describeEntry(entry)} </li> for entry, step in filteredLog}
+                {<li key={step}> {item.description.nodes} </li> for item, step in filteredLog}
               </ol>
             else
               <Typography color="text.secondary">No log entries match your search.</Typography>

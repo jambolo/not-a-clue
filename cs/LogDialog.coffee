@@ -16,7 +16,7 @@ PlayerName = ({ name, color }) ->
   <Typography component="span" sx={{ fontWeight: 700, color: color or 'primary.main' }}>{name}</Typography>
 
 CardName = ({ name }) ->
-  <Typography component="span" sx={{ fontWeight: 700, color: 'secondary.main', fontStyle: 'italic' }}>{name}</Typography>
+  <Typography component="span" sx={{ fontWeight: 700, color: 'black', fontStyle: 'italic' }}>{name}</Typography>
 
 VariationName = ({ name }) ->
   <Typography component="span" sx={{ fontWeight: 700, color: 'info.main', letterSpacing: 0.5 }}>{name}</Typography>

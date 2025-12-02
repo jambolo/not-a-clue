@@ -12,11 +12,11 @@ import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 `
 
-PlayerName = ({ name }) ->
-  <Typography component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>{name}</Typography>
+PlayerName = ({ name, color }) ->
+  <Typography component="span" sx={{ fontWeight: 700, color: color or 'primary.main' }}>{name}</Typography>
 
 CardName = ({ name }) ->
-  <Typography component="span" sx={{ fontWeight: 700, color: 'secondary.main', fontStyle: 'italic' }}>{name}</Typography>
+  <Typography component="span" sx={{ fontWeight: 700, color: 'black', fontStyle: 'italic' }}>{name}</Typography>
 
 VariationName = ({ name }) ->
   <Typography component="span" sx={{ fontWeight: 700, color: 'info.main', letterSpacing: 0.5 }}>{name}</Typography>
@@ -61,9 +61,9 @@ transcribedListNodes = (list) ->
 
 playerList = (playerIds) -> if playerIds.length > 0 then transcribedList(playerIds) else "Nobody"
 
-playerListNodes = (playerIds) ->
+playerListNodes = (playerIds, colorFor) ->
   if playerIds.length > 0
-    transcribedListNodes(<PlayerName name={id} /> for id in playerIds)
+    transcribedListNodes(<PlayerName name={id} color={colorFor?(id)} /> for id in playerIds)
   else
     "Nobody"
 
@@ -109,6 +109,9 @@ class LogDialog extends Component
     @state = { query: "" }
     return
 
+  playerColor: (playerId) ->
+    @props.app?.getPlayerColor(playerId) or @props.playerColors?[playerId] or 'primary.main'
+
   describeSetup: (info) ->
     text = "Playing #{@configuration.name} with #{playerList(info.players)}."
     nodes =
@@ -116,7 +119,7 @@ class LogDialog extends Component
         {"Playing "}
         <VariationName name={@configuration.name} />
         {" with "}
-        {playerListNodes(info.players)}
+        {playerListNodes(info.players, (id) => @playerColor(id))}
         {"."}
       </React.Fragment>
     { text, nodes }
@@ -125,7 +128,7 @@ class LogDialog extends Component
     text = "#{info.player} has #{cardList(info.cards, @configuration)}."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.player} />
+        <PlayerName name={info.player} color={@playerColor(info.player)} />
         {" has "}
         {cardListNodes(info.cards, @configuration)}
         {"."}
@@ -142,11 +145,11 @@ class LogDialog extends Component
     text = "#{info.suggester} suggested: #{suggestedCardsClause(info.cards, @configuration)}. #{playerList(info.showed)} showed a card."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.suggester} />
+        <PlayerName name={info.suggester} color={@playerColor(info.suggester)} />
         {" suggested: "}
         {suggestedCardsClauseNodes(info.cards, @configuration)}
         {". "}
-        {playerListNodes(info.showed)}
+        {playerListNodes(info.showed, (id) => @playerColor(id))}
         {" showed a card."}
       </React.Fragment>
     { text, nodes }
@@ -164,22 +167,22 @@ class LogDialog extends Component
         if info.showed.length > 1
           [
             " "
-            playerListNodes(info.showed[0...-1])
+            playerListNodes(info.showed[0...-1], (id) => @playerColor(id))
             " did not show a card. "
-            <PlayerName name={info.showed[info.showed.length-1]} />
+            <PlayerName name={info.showed[info.showed.length-1]} color={@playerColor(info.showed[info.showed.length-1])} />
             " showed a card."
           ]
         else
           [
             " "
-            <PlayerName name={info.showed[0]} />
+            <PlayerName name={info.showed[0]} color={@playerColor(info.showed[0])} />
             " showed a card."
           ]
       else
         " Nobody showed a card."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.suggester} />
+        <PlayerName name={info.suggester} color={@playerColor(info.suggester)} />
         {" suggested "}
         {suggestedCardsClauseNodes(info.cards, @configuration)}
         {"."}
@@ -192,7 +195,7 @@ class LogDialog extends Component
     text = "#{info.player} showed #{cardPhrase(cards[info.card], @configuration, false)}."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.player} />
+        <PlayerName name={info.player} color={@playerColor(info.player)} />
         {" showed "}
         {cardPhraseNode(cards[info.card], @configuration, false)}
         {"."}
@@ -203,7 +206,7 @@ class LogDialog extends Component
     text = "#{info.accuser} made an accusation: #{suggestedCardsClause(info.cards, @configuration)}. The accusation was #{if info.correct then "" else "not "}correct."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.accuser} />
+        <PlayerName name={info.accuser} color={@playerColor(info.accuser)} />
         {" made an accusation: "}
         {suggestedCardsClauseNodes(info.cards, @configuration)}
         {". The accusation was "}
@@ -215,14 +218,14 @@ class LogDialog extends Component
     text = "#{info.caller} asked #{info.receiver} about #{suggestedCardsClause(info.cards, @configuration)}. #{info.receiver} #{if info.showed then "showed" else "did not show"} a card."
     nodes =
       <React.Fragment>
-        <PlayerName name={info.caller} />
+        <PlayerName name={info.caller} color={@playerColor(info.caller)} />
         {" asked "}
-        <PlayerName name={info.receiver} />
+        <PlayerName name={info.receiver} color={@playerColor(info.receiver)} />
         {" about "}
         {suggestedCardsClauseNodes(info.cards, @configuration)}
         {". "}
-        <PlayerName name={info.receiver} />
-        {" #{if info.showed then "showed" else "did not show"} a card."}
+        <PlayerName name={info.receiver} color={@playerColor(info.receiver)} />
+        {if info.showed then " showed a card." else " did not show a card."}
       </React.Fragment>
     { text, nodes }
 

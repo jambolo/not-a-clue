@@ -59,7 +59,7 @@ class ShowDialog extends Component
     return
 
   render: ->
-    { open, players, configuration } = @props
+    { open, players, configuration, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record A Shown Card</DialogTitle>
       <DialogContent>
@@ -67,6 +67,7 @@ class ShowDialog extends Component
         <PlayerChooser 
           value={@state.playerId} 
           players={players} 
+          playerColors={playerColors}
           onChange={@handleChangePlayer} />
         <Divider />
         <Typography variant="h4">What card did they show?</Typography>

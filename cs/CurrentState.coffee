@@ -33,11 +33,11 @@ StateElement = (props) ->
     <No />
 
 HeaderRow = (props) ->
-  { players } = props
+  { players, app } = props
 
   <Grid container item xs={12} alignItems="center" sx={{ py: 1, borderBottom: 1, borderColor: 'divider' }}>
     <Grid item xs={4}><Typography variant="subtitle2">Card</Typography></Grid>
-    {<Grid item key={playerId} xs={1} textAlign="center"><Typography variant="subtitle2">{playerId}</Typography></Grid> for playerId of players}
+    {<Grid item key={playerId} xs={1} textAlign="center"><Typography variant="subtitle2" sx={{ color: app.getPlayerColor(playerId), fontWeight: 700 }}>{playerId}</Typography></Grid> for playerId of players}
   </Grid>
 
 StateRow = (props) ->
@@ -79,6 +79,7 @@ Filters = ({ query, onQuery, showOnlyUnknown, onToggleUnknown }) ->
 
 CurrentState = (props) ->
   { cards, players } = props.solver
+  { app } = props
   [query, setQuery] = React.useState("")
   [showOnlyUnknown, setShowOnlyUnknown] = React.useState(false)
 
@@ -101,7 +102,7 @@ CurrentState = (props) ->
     />
     <Paper variant="outlined" sx={{ overflowX: 'auto' }}>
       <Grid container>
-        <HeaderRow players={players} />
+        <HeaderRow players={players} app={app} />
         {<StateRow key={card.id} card={card} players={players} /> for card in filteredCards}
       </Grid>
       {

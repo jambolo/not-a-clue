@@ -233,7 +233,7 @@ class Solver
       else if playerId isnt @ANSWER_PLAYER_ID and playerId isnt suggesterId
         # ... then they don't hold any of them.
         @addDiscoveries playerId, cardIds, false, "did not show a card in suggestion #" + id
-        @disassociatePlayerWithCards(playerId, suggestion.cardIds, changed)
+        changed = @disassociatePlayerWithCards(playerId, suggestion.cardIds, changed)
 
       # Otherwise, for the answer and suggester, if 3 cards were shown ...
       else

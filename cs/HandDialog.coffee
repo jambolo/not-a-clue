@@ -70,12 +70,12 @@ class HandDialog extends Component
     return
 
   render: ->
-    { open, players, configuration } = @props
+    { open, players, configuration, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record Your Hand</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Which player are you?</Typography>
-        <PlayerChooser value={@state.playerId} players={players} onChange={@handleChangePlayer} />
+        <PlayerChooser value={@state.playerId} players={players} playerColors={playerColors} onChange={@handleChangePlayer} />
         <Divider />
         <Typography variant="h6">Select the cards in your hand:</Typography>
         <MultipleCardChooser 

@@ -1,7 +1,7 @@
 `
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import CurrentState from './CurrentState'
-import Divider from '@material-ui/core/Divider'
+import Divider from '@mui/material/Divider'
 import React from 'react';
 import TopBar from './TopBar'
 `

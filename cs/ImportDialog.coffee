@@ -1,12 +1,12 @@
 `
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import React, { Component } from 'react';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography'
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography'
 `
 
 class ImportDialog extends Component
@@ -21,7 +21,8 @@ class ImportDialog extends Component
     @props.onClose()
     return
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
@@ -40,7 +41,7 @@ class ImportDialog extends Component
 
   render: ->
     { open } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title"> Import </DialogTitle>
       <DialogContent>
       <Typography variant="h6"> Paste an exported log into the text field below: </Typography>

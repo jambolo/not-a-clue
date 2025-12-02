@@ -2,18 +2,18 @@
 import PerCategoryCardChooser from './PerCategoryCardChooser'
 import PlayerChooser from './PlayerChooser'
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 class AccuseDialog extends Component
@@ -37,7 +37,8 @@ class AccuseDialog extends Component
     cardCount = Object.keys(@state.cardIds).length
     return @state.accuserId? and cardCount == 3 and @state.correct?
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
@@ -71,7 +72,7 @@ class AccuseDialog extends Component
 
   render: ->
     { open, configuration, players } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record An Accusation</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Who made the accusation?</Typography>

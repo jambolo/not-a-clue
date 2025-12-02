@@ -1,6 +1,6 @@
 `
-import Grid from '@material-ui/core/Grid';
-import Icon from '@material-ui/core/Icon';
+import Grid from '@mui/material/Grid';
+import Icon from '@mui/material/Icon';
 import React from 'react';
 `
 
@@ -29,7 +29,7 @@ StateElement = (props) ->
 HeaderRow = (props) ->
   { players } = props
 
-  <Grid container item xs={12} justify="center">
+  <Grid container item xs={12} justifyContent="center">
     <Grid item xs={4}><b>Card</b></Grid>
     {<Grid item key={playerId} xs={1}><b>{playerId}</b></Grid> for playerId of players}
   </Grid>
@@ -37,7 +37,7 @@ HeaderRow = (props) ->
 StateRow = (props) ->
   {card, players} = props
 
-  <Grid container item xs={12} justify="center">
+  <Grid container item xs={12} justifyContent="center">
     <Grid item xs={4}>
       {
         if card.isHeldBy("ANSWER")

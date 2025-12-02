@@ -2,14 +2,14 @@
 import MultipleCardChooser from './MultipleCardChooser'
 import PlayerChooser from './PlayerChooser'
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 class HandDialog extends Component
@@ -30,7 +30,8 @@ class HandDialog extends Component
 
   stateIsOk: -> @state.playerId? and @state.cardIds.length > 0
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
@@ -70,7 +71,7 @@ class HandDialog extends Component
 
   render: ->
     { open, players, configuration } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record Your Hand</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Which player are you?</Typography>

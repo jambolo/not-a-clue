@@ -1,9 +1,9 @@
 `
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import React, { Component } from 'react';
 `
 
@@ -106,7 +106,11 @@ class LogDialog extends Component
     { open, log, configurations, onClose } = @props
     @configuration = if log[0]? and log[0].setup? then configurations[log[0].setup.variation] else null
 
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={onClose}>
+    handleDialogClose = (event, reason) ->
+      return if reason is 'backdropClick'
+      onClose()
+
+    <Dialog open={open} fullScreen={true} onClose={handleDialogClose}>
       <DialogTitle id="form-dialog-title">Log</DialogTitle>
       <DialogContent>
         <ol>

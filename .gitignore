@@ -24,3 +24,7 @@ yarn-error.log*
 
 # coffee-script
 /src/**/*.js
+
+# diff files
+*.orig
+*.rej

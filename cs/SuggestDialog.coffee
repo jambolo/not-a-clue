@@ -3,14 +3,14 @@ import PerCategoryCardChooser from './PerCategoryCardChooser'
 import MultiplePlayerChooser from './MultiplePlayerChooser'
 import PlayerChooser from './PlayerChooser'
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Divider from '@material-ui/core/Divider';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
 import React, { Component } from 'react';
-import Typography from '@material-ui/core/Typography'
+import Typography from '@mui/material/Typography'
 `
 
 class SuggestDialog extends Component
@@ -38,7 +38,8 @@ class SuggestDialog extends Component
 
   stateIsOk: -> if @props.configuration.rulesId is "master" then @stateIsOkMaster() else @stateIsOkClassic()
 
-  handleClose: =>
+  handleClose: (event, reason) =>
+    return if reason is 'backdropClick'
     @close()
     return
 
@@ -134,7 +135,7 @@ class SuggestDialog extends Component
 
   render: ->
     { open, players, configuration } = @props
-    <Dialog open={open} fullscreen="true" disableBackdropClick={true} onClose={@handleClose}>
+    <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record A Suggestion</DialogTitle>
       <DialogContent>
         <Typography variant="h4"> Who made the suggestion? </Typography>

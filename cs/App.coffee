@@ -17,6 +17,7 @@ import SetupDialog from './SetupDialog'
 import ShowDialog from './ShowDialog'
 import SuggestDialog from './SuggestDialog'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
+import { buildPlayerColors, playerColorFor } from './playerColors'
 `
 
 theme = createTheme
@@ -225,6 +226,7 @@ class App extends Component
     @commlinkId      = 1
     @suggestionId    = 1
     @playerIds       = []
+    @playerColors    = {}
     @configurationId = "master_detective"
     @log             = []
     @state           =
@@ -251,6 +253,7 @@ class App extends Component
     @commlinkId      = 1
     @suggestionId    = 1
     @playerIds       = playerIds
+    @playerColors    = buildPlayerColors(playerIds)
     @configurationId = configurationId
     @log             = []
 
@@ -674,6 +677,7 @@ class App extends Component
           open={@state.logDialogOpen}
           log={@log}
           configurations={configurations}
+          playerColors={@playerColors}
           onClose={() => @setState({ logDialogOpen: false })}
           app={this}
         />
@@ -696,6 +700,7 @@ class App extends Component
           open={@state.handDialogOpen}
           configuration={configurations[@configurationId]}
           players={@playerIds}
+          playerColors={@playerColors}
           onDone={@recordHand}
           onClose={() => @setState({ handDialogOpen: false })}
           app={this}
@@ -704,6 +709,7 @@ class App extends Component
           open={@state.suggestDialogOpen}
           configuration={configurations[@configurationId]}
           players={@playerIds}
+          playerColors={@playerColors}
           onDone={@recordSuggestion}
           onClose={() => @setState({ suggestDialogOpen: false })}
           app={this}
@@ -712,6 +718,7 @@ class App extends Component
           open={@state.showDialogOpen}
           configuration={configurations[@configurationId]}
           players={@playerIds}
+          playerColors={@playerColors}
           onDone={@recordShown}
           onClose={() => @setState({ showDialogOpen: false })}
           app={this}
@@ -720,6 +727,7 @@ class App extends Component
           open={@state.accuseDialogOpen}
           configuration={configurations[@configurationId]}
           players={@playerIds}
+          playerColors={@playerColors}
           onDone={@recordAccusation}
           onClose={() => @setState({ accuseDialogOpen: false })}
           app={this}
@@ -728,6 +736,7 @@ class App extends Component
           open={@state.commlinkDialogOpen}
           configuration={configurations[@configurationId]}
           players={@playerIds}
+          playerColors={@playerColors}
           onDone={@recordCommlink}
           onClose={() => @setState({ commlinkDialogOpen: false })}
           app={this}
@@ -747,6 +756,9 @@ class App extends Component
         noAction:  null 
     }
     return
+
+  getPlayerColor: (playerId) =>
+    playerColorFor(@playerColors, playerId)
 
 
 export default App

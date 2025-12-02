@@ -86,7 +86,7 @@ class CommlinkDialog extends Component
     return
 
   render: ->
-    { open, players, configuration } = @props
+    { open, players, configuration, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title"> Record A Commlink </DialogTitle>
       <DialogContent>
@@ -94,6 +94,7 @@ class CommlinkDialog extends Component
         <PlayerChooser 
           value={@state.callerId} 
           players={players} 
+          playerColors={playerColors}
             excluded={if @state.receiverId? then [@state.receiverId] else []} 
           onChange={@handleChangeCallerId} 
         />
@@ -102,6 +103,7 @@ class CommlinkDialog extends Component
         <PlayerChooser 
           value={@state.receiverId} 
           players={players} 
+          playerColors={playerColors}
             excluded={if @state.callerId? then [@state.callerId] else []} 
           onChange={@handleChangeSubjectId} 
           />

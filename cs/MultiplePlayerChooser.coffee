@@ -12,10 +12,11 @@ class MultiplePlayerChooser extends Component
       @props.onChange id, event.target.checked
 
   render:->
-    { value, players, excluded } = @props
+    { value, players, excluded, playerColors } = @props
     <FormGroup row>
       {
         for id in players
+          color = if playerColors? then playerColors[id] else undefined
           <FormControlLabel
             key={id}
             value={id}
@@ -26,7 +27,8 @@ class MultiplePlayerChooser extends Component
                 onChange={@makeChangeHandler(id)}
                 value={id}
               />
-            } label={id}
+            } label={<span style={{ color: color, fontWeight: 600 }}>{id}</span>}
+            sx={{ color: color }}
           />
       }
     </FormGroup>

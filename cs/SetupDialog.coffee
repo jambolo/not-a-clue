@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert'
+import { buildPlayerColors } from './playerColors'
 `
 ConfigurationChoices = (props) ->
   { choice, configurations, numPlayers, onChange } = props
@@ -105,8 +106,9 @@ class AddPlayerInput extends Component
     </div>
 
 PlayerList = (props) ->
+  colors = buildPlayerColors(props.names)
   <ol>
-    {props.names.map((playerId) => <li key={playerId}> {playerId} </li>)}
+    {props.names.map((playerId) => <li key={playerId} style={{ color: colors[playerId], fontWeight: 600 }}> {playerId} </li>)}
   </ol>
 
 AddPlayers = (props) ->

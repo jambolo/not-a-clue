@@ -134,12 +134,12 @@ class SuggestDialog extends Component
     return
 
   render: ->
-    { open, players, configuration } = @props
+    { open, players, configuration, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record A Suggestion</DialogTitle>
       <DialogContent>
         <Typography variant="h4"> Who made the suggestion? </Typography>
-        <PlayerChooser value={@state.suggesterId} players={players} onChange={@handleChangeSuggesterId} />
+        <PlayerChooser value={@state.suggesterId} players={players} playerColors={playerColors} onChange={@handleChangeSuggesterId} />
         <Divider />
         <Typography variant="h4"> What cards were suggested? </Typography>
         <PerCategoryCardChooser 
@@ -156,6 +156,7 @@ class SuggestDialog extends Component
               <MultiplePlayerChooser 
                 value={@state.showedIds} 
                 players={players} 
+                playerColors={playerColors}
                 excluded={if @state.suggesterId isnt null then [@state.suggesterId] else []} 
                 onChange={@handleChangeShowedIdsMaster} 
               />
@@ -166,6 +167,7 @@ class SuggestDialog extends Component
               <MultiplePlayerChooser 
                 value={@state.didNotShowIds} 
                 players={players} 
+                playerColors={playerColors}
                 excluded={(
                   if @state.suggesterId isnt null
                     @state.showedIds.concat([@state.suggesterId])
@@ -178,6 +180,7 @@ class SuggestDialog extends Component
               <PlayerChooser 
                 value={@state.showedIds[0]} 
                 players={players} 
+                playerColors={playerColors}
                 excluded={(
                   if @state.suggesterId isnt null 
                     @state.didNotShowIds.concat([@state.suggesterId]) 

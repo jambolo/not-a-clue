@@ -71,12 +71,12 @@ class AccuseDialog extends Component
     return
 
   render: ->
-    { open, configuration, players } = @props
+    { open, configuration, players, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
       <DialogTitle id="form-dialog-title">Record An Accusation</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Who made the accusation?</Typography>
-        <PlayerChooser value={@state.accuserId} players={players} onChange={@handleChangeAccuserId} />
+        <PlayerChooser value={@state.accuserId} players={players} playerColors={playerColors} onChange={@handleChangeAccuserId} />
         <Divider />
         <Typography variant="h6">What was the accusation?</Typography>
         <PerCategoryCardChooser 

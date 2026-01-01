@@ -78,3 +78,27 @@ CoffeeScript files in `cs/` are compiled to JavaScript in `src/`. The `src/*.js`
 - JSX is used in `.js` files (generated from CoffeeScript)
 - Vite configured to handle JSX in `.js` files via `esbuild.loader`
 - Uses `import.meta.env.PROD` instead of `process.env.NODE_ENV`
+
+### Bumping Minor Version
+
+1. Create release branch, update version in `package.json` and `cs/version.coffee`, commit:
+
+   ```bash
+   git checkout -b release/<version>
+   # edit package.json and cs/version.coffee
+   git add package.json cs/version.coffee && git commit -m "Bumped version to <version>"
+   ```
+
+2. Merge to master, tag, and push:
+
+   ```bash
+   git checkout master && git merge --no-ff release/<version>
+   git tag v<version> && git push origin master v<version>
+   ```
+
+3. Merge to develop and clean up:
+
+   ```bash
+   git checkout develop && git merge --no-ff master && git push origin develop
+   git branch -d release/<version>
+   ```

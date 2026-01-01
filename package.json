@@ -6,27 +6,30 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^6.5.0",
-    "@mui/material": "^6.5.0",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
     "core-js": "^3.47.0",
     "material-design-icons": "^3.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.9.6",
-    "react-scripts": "^5.0.1"
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
     "coffeescript": "^2.7.0",
-    "eslint": "^8.56.0"
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
     "compile": "coffee -c -o src/ -b cs/",
-    "watch": "coffee -c -o src/ -b -w cs/",
-    "dev": "pnpm start & pnpm watch"
+    "watch": "coffee -c -o src/ -b -w cs/"
   },
   "repository": {
     "type": "git",
@@ -43,7 +46,23 @@
   },
   "homepage": ".",
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2021,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    }
   },
   "browserslist": [
     ">0.2%",

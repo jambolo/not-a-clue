@@ -10,6 +10,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -28,3 +29,9 @@ yarn-error.log*
 # diff files
 *.orig
 *.rej
+
+# Claude files
+.claude/
+
+# IDEs and editors
+.vscode/

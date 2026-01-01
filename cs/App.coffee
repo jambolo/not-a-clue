@@ -23,19 +23,72 @@ import { buildPlayerColors, playerColorFor } from './playerColors'
 theme = createTheme
   palette:
     primary:
-      main: '#5E81F4'
+      main: '#6366f1'
+      light: '#818cf8'
+      dark: '#4f46e5'
     secondary:
-      main: '#F97316'
+      main: '#f59e0b'
+      light: '#fbbf24'
+      dark: '#d97706'
+    success:
+      main: '#10b981'
+    error:
+      main: '#ef4444'
     background:
-      default: '#f6f8fb'
+      default: '#faf9f7'
+      paper: '#ffffff'
+    text:
+      primary: '#1e1b4b'
+      secondary: '#64748b'
+    divider: 'rgba(0, 0, 0, 0.08)'
   shape:
-    borderRadius: 14
+    borderRadius: 16
   typography:
     fontFamily: '"Inter", "Helvetica", "Arial", sans-serif'
+    h4:
+      fontWeight: 700
+      letterSpacing: '-0.02em'
     h5:
       fontWeight: 700
+      letterSpacing: '-0.01em'
+    h6:
+      fontWeight: 600
+    subtitle1:
+      fontWeight: 500
     button:
       textTransform: 'none'
+      fontWeight: 600
+  components:
+    MuiButton:
+      styleOverrides:
+        root:
+          borderRadius: 12
+          padding: '10px 20px'
+          boxShadow: 'none'
+          '&:hover':
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)'
+        containedPrimary:
+          background: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)'
+        containedSecondary:
+          background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)'
+    MuiCard:
+      styleOverrides:
+        root:
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05)'
+          border: '1px solid rgba(0, 0, 0, 0.04)'
+    MuiDialog:
+      styleOverrides:
+        paper:
+          borderRadius: 20
+    MuiChip:
+      styleOverrides:
+        root:
+          fontWeight: 500
+    MuiTextField:
+      styleOverrides:
+        root:
+          '& .MuiOutlinedInput-root':
+            borderRadius: 12
 
 classic =
   name:       "Classic"

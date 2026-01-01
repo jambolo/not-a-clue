@@ -16,26 +16,48 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Chip from '@mui/material/Chip'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
 import { buildPlayerColors } from './playerColors'
 `
 ConfigurationChoices = (props) ->
   { choice, configurations, numPlayers, onChange } = props
 
-  <Stack spacing={1}>
+  <Stack spacing={1.5}>
     {
       for id, configuration of configurations
-        <Paper key={id} variant={if choice is id then 'outlined' else 'elevation'} sx={{ p: 2, borderColor: if choice is id then 'primary.main' else undefined }}>
+        isSelected = choice is id
+        isDisabled = configuration.maxPlayers < numPlayers
+        <Paper
+          key={id}
+          elevation={0}
+          sx={{
+            p: 2.5
+            borderRadius: 3
+            border: '2px solid'
+            borderColor: if isSelected then 'primary.main' else 'divider'
+            bgcolor: if isSelected then 'rgba(99, 102, 241, 0.04)' else 'background.paper'
+            opacity: if isDisabled then 0.5 else 1
+            cursor: if isDisabled then 'not-allowed' else 'pointer'
+            transition: 'all 0.2s ease'
+            '&:hover': if not isDisabled then { borderColor: 'primary.light', transform: 'translateY(-1px)' } else {}
+          }}
+          onClick={() -> onChange({ target: { value: id } }) if not isDisabled}>
           <FormControlLabel
             value={id}
-            control={<Radio checked={choice is id} onChange={onChange} /> }
-            label=
+            control={<Radio checked={isSelected} onChange={onChange} sx={{ display: 'none' }} />}
+            label={
               <Stack spacing={0.5}>
-                <Typography variant="subtitle1" fontWeight={600}>{configuration.name}</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>{configuration.name}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {configuration.minPlayers} - {configuration.maxPlayers} players · {Object.keys(configuration.cards).length} cards
+                  {configuration.minPlayers}–{configuration.maxPlayers} players · {Object.keys(configuration.cards).length} cards
                 </Typography>
               </Stack>
-            disabled={configuration.maxPlayers < numPlayers}
+            }
+            disabled={isDisabled}
+            sx={{ m: 0, width: '100%' }}
           />
         </Paper>
     }
@@ -43,9 +65,9 @@ ConfigurationChoices = (props) ->
 
 ConfigurationChooser = (props) ->
   <FormControl component="fieldset" fullWidth>
-    <FormLabel component="legend"><Typography variant="h6">Select a variation</Typography></FormLabel>
-    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-      Choose the rule set that matches your board. Options that cannot support your player count are disabled.
+    <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 600 }}>Select a variation</Typography>
+    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      Choose the game edition that matches your board.
     </Typography>
     <ConfigurationChoices
       choice={props.choice}
@@ -84,46 +106,67 @@ class AddPlayerInput extends Component
     return
 
   render: ->
-    <div>
+    <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mt: 1 }}>
       <TextField
         autoFocus
-        margin="normal"
         label="Player name"
         placeholder="Enter a unique name"
         value={@state.playerId}
         onChange={@handleChange}
         onKeyDown={@handleKeyDown}
-        helperText="Press Enter to add quickly"
+        helperText="Press Enter to add"
+        size="small"
+        sx={{ flexGrow: 1, maxWidth: 280 }}
       />
       <Button
         disabled={@props.count >= @props.max}
         variant="contained"
         color="primary"
         onClick={@handleAddPlayer}
-      >
+        sx={{ mt: 0.5 }}>
         Add
       </Button>
-    </div>
+    </Stack>
 
 PlayerList = (props) ->
   colors = buildPlayerColors(props.names)
-  <ol>
-    {props.names.map((playerId) => <li key={playerId} style={{ color: colors[playerId], fontWeight: 600 }}> {playerId} </li>)}
-  </ol>
+  return null if props.names.length == 0
+  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
+    {props.names.map((playerId, idx) =>
+      <Chip
+        key={playerId}
+        label={playerId}
+        sx={{
+          bgcolor: colors[playerId]
+          color: 'white'
+          fontWeight: 600
+          fontSize: '0.875rem'
+        }}
+      />
+    )}
+  </Stack>
 
 AddPlayers = (props) ->
   { players, max, app, onAddPlayer, onClearPlayers } = props
-  <div>
-    <AddPlayerInput 
-      players={players} 
-      count={players.length} 
-      max={max} 
+  <Box>
+    <AddPlayerInput
+      players={players}
+      count={players.length}
+      max={max}
       app={app}
-      onAddPlayer={onAddPlayer} 
+      onAddPlayer={onAddPlayer}
     />
     <PlayerList names={players} />
-    <Button variant="contained" color="primary" onClick={onClearPlayers}>Clear Players</Button>
-  </div>
+    {players.length > 0 and
+      <Button
+        variant="text"
+        size="small"
+        onClick={onClearPlayers}
+        sx={{ mt: 2, color: 'text.secondary' }}>
+        Clear all players
+      </Button>
+    }
+  </Box>
 
 class SetupDialog extends Component
   constructor: (props) ->
@@ -166,43 +209,69 @@ class SetupDialog extends Component
     maxPlayers = if @state.configurationId then configurations[@state.configurationId].maxPlayers else 0
 
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
-      <DialogTitle id="form-dialog-title">New Game</DialogTitle>
-      <DialogContent dividers sx={{ bgcolor: 'background.default' }}>
-        <Stack spacing={3}>
-          <ConfigurationChooser
-            choice={@state.configurationId}
-            configurations={configurations}
-            numPlayers={numPlayers}
-            onChange={@handleChangeConfiguration}
-          />
-          <Divider />
-          <Stack spacing={1}>
-            <Typography variant="h6">{ if maxPlayers > 0 then "Add up to #{maxPlayers} players" else "Add players"}</Typography>
-            <Typography variant="body2" color="text.secondary">Player names must be unique and cannot use the reserved word ANSWER.</Typography>
-            <AddPlayers
-              players={@state.playerIds}
-              max={maxPlayers}
-              app={app}
-              onAddPlayer={@handleAddPlayer}
-              onClearPlayers={@handleClearPlayers}
+      <DialogTitle
+        sx={{
+          display: 'flex'
+          alignItems: 'center'
+          justifyContent: 'space-between'
+          borderBottom: 1
+          borderColor: 'divider'
+          py: 2
+          px: 3
+        }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>New Game</Typography>
+          <Typography variant="body2" color="text.secondary">Set up your game session</Typography>
+        </Box>
+        <IconButton onClick={@handleCancel} sx={{ color: 'text.secondary' }}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ bgcolor: 'background.default', p: { xs: 2, md: 4 } }}>
+        <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Stack spacing={4}>
+            <ConfigurationChooser
+              choice={@state.configurationId}
+              configurations={configurations}
+              numPlayers={numPlayers}
+              onChange={@handleChangeConfiguration}
             />
-            {
-              if maxPlayers > 0
-                <Alert severity={if numPlayers < minPlayers then 'info' else 'success'}>
-                  {numPlayers} of {minPlayers}–{maxPlayers} players added.
-                </Alert>
-            }
+            <Divider />
+            <Stack spacing={1}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                { if maxPlayers > 0 then "Add players (#{minPlayers}–#{maxPlayers})" else "Add players"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Enter each player's name. Names must be unique.
+              </Typography>
+              <AddPlayers
+                players={@state.playerIds}
+                max={maxPlayers}
+                app={app}
+                onAddPlayer={@handleAddPlayer}
+                onClearPlayers={@handleClearPlayers}
+              />
+              {
+                if maxPlayers > 0 and numPlayers > 0
+                  <Alert
+                    severity={if numPlayers < minPlayers then 'info' else 'success'}
+                    sx={{ mt: 2, borderRadius: 2 }}>
+                    {numPlayers} of {minPlayers}–{maxPlayers} players added
+                    {if numPlayers >= minPlayers then " — ready to play!" else "."}
+                  </Alert>
+              }
+            </Stack>
           </Stack>
-        </Stack>
+        </Box>
       </DialogContent>
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button variant="outlined" color="primary" onClick={@handleCancel}>Cancel</Button>
+      <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider', gap: 1 }}>
+        <Button variant="outlined" onClick={@handleCancel}>Cancel</Button>
         <Button
           disabled={not @state.configurationId? or numPlayers < minPlayers}
           variant="contained"
           color="primary"
           onClick={@handleDone}
-        >
+          sx={{ px: 4 }}>
           Start game
         </Button>
       </DialogActions>

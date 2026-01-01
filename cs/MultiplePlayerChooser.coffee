@@ -1,8 +1,11 @@
 `
+import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
+import Paper from '@mui/material/Paper';
 import React, {Component} from 'react';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 `
 
 class MultiplePlayerChooser extends Component
@@ -13,24 +16,45 @@ class MultiplePlayerChooser extends Component
 
   render:->
     { value, players, excluded, playerColors } = @props
-    <FormGroup row>
+    <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
       {
         for id in players
-          color = if playerColors? then playerColors[id] else undefined
-          <FormControlLabel
+          color = if playerColors? then playerColors[id] else '#6366f1'
+          isSelected = id in value
+          isDisabled = excluded? and id in excluded
+          <Paper
             key={id}
-            value={id}
-            control={
-              <Checkbox
-                checked={id in value}
-                disabled={excluded? and id in excluded}
-                onChange={@makeChangeHandler(id)}
-                value={id}
-              />
-            } label={<span style={{ color: color, fontWeight: 600 }}>{id}</span>}
-            sx={{ color: color }}
-          />
+            elevation={0}
+            sx={{
+              px: 2.5
+              py: 1.5
+              borderRadius: 2
+              border: '2px solid'
+              borderColor: if isSelected then color else 'divider'
+              bgcolor: if isSelected then "#{color}15" else 'background.paper'
+              opacity: if isDisabled then 0.4 else 1
+              cursor: if isDisabled then 'not-allowed' else 'pointer'
+              transition: 'all 0.15s ease'
+              '&:hover': if not isDisabled then { borderColor: color, transform: 'translateY(-1px)' } else {}
+            }}
+            onClick={() => @props.onChange(id, not isSelected) if not isDisabled}>
+            <FormControlLabel
+              value={id}
+              control={
+                <Checkbox
+                  checked={isSelected}
+                  disabled={isDisabled}
+                  onChange={@makeChangeHandler(id)}
+                  value={id}
+                  size="small"
+                  sx={{ display: 'none' }}
+                />
+              }
+              label={<Typography sx={{ color: color, fontWeight: 600, fontSize: '0.95rem' }}>{id}</Typography>}
+              sx={{ m: 0 }}
+            />
+          </Paper>
       }
-    </FormGroup>
+    </Stack>
 
 export default MultiplePlayerChooser

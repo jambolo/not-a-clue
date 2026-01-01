@@ -1,1 +1,1 @@
-module.exports = '1.6.1'
+export default '1.6.1'

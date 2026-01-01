@@ -1,26 +1,53 @@
 `
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
-import Grid from '@mui/material/Grid'
 import Icon from '@mui/material/Icon'
+import InputAdornment from '@mui/material/InputAdornment'
 import Paper from '@mui/material/Paper'
 import React from 'react';
+import SearchIcon from '@mui/icons-material/Search'
 import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 `
 
 Yes = (props) ->
-  <Icon color={if props.isAnswer then "primary" else "success"} fontSize="small">
-    {if props.isAnswer then "star" else "check_circle"}
-  </Icon>
+  <Box
+    sx={{
+      width: 24
+      height: 24
+      borderRadius: '50%'
+      bgcolor: if props.isAnswer then 'primary.main' else 'success.main'
+      display: 'flex'
+      alignItems: 'center'
+      justifyContent: 'center'
+      mx: 'auto'
+    }}>
+    <Icon sx={{ color: 'white', fontSize: 16 }}>
+      {if props.isAnswer then "star" else "check"}
+    </Icon>
+  </Box>
 
-No = () -> ""
+No = () ->
+  <Box sx={{ width: 24, height: 24, mx: 'auto' }} />
 
 Maybe = () ->
-  <Icon color="disabled" fontSize="small">
-    indeterminate_check_box
-  </Icon>
+  <Box
+    sx={{
+      width: 24
+      height: 24
+      borderRadius: '50%'
+      border: '2px dashed'
+      borderColor: 'divider'
+      mx: 'auto'
+    }}
+  />
 
 StateElement = (props) ->
   { card, player } = props
@@ -34,46 +61,79 @@ StateElement = (props) ->
 
 HeaderRow = (props) ->
   { players, app } = props
-
-  <Grid container item xs={12} alignItems="center" sx={{ py: 1, borderBottom: 1, borderColor: 'divider' }}>
-    <Grid item xs={4}><Typography variant="subtitle2">Card</Typography></Grid>
-    {<Grid item key={playerId} xs={1} textAlign="center"><Typography variant="subtitle2" sx={{ color: app.getPlayerColor(playerId), fontWeight: 700 }}>{playerId}</Typography></Grid> for playerId of players}
-  </Grid>
-
-StateRow = (props) ->
-  {card, players} = props
-
-  <Grid container item xs={12} alignItems="center" sx={{ py: 1, borderBottom: 1, borderColor: 'divider' }}>
-    <Grid item xs={4}>
-      <Typography fontWeight={if card.isHeldBy("ANSWER") then 700 else 500}>{card.info.name}</Typography>
-      <Typography variant="caption" color="text.secondary">{card.info.type}</Typography>
-    </Grid>
+  <TableRow sx={{ bgcolor: 'rgba(0, 0, 0, 0.02)' }}>
+    <TableCell sx={{ fontWeight: 600, color: 'text.secondary', py: 1.5, pl: 2 }}>Card</TableCell>
     {
       for playerId of players
-        <Grid
-          item
+        <TableCell
           key={playerId}
-          xs={1}
-          textAlign="center">
-          <StateElement card={card} player={playerId} />
-        </Grid>
+          align="center"
+          sx={{
+            fontWeight: 700
+            color: app.getPlayerColor(playerId)
+            py: 1.5
+            px: 1
+            fontSize: '0.75rem'
+            minWidth: 48
+          }}>
+          {playerId}
+        </TableCell>
     }
-  </Grid>
+  </TableRow>
+
+StateRow = (props) ->
+  { card, players, isHighlight } = props
+  <TableRow
+    sx={{
+      bgcolor: if isHighlight then 'rgba(99, 102, 241, 0.04)' else 'transparent'
+      '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.02)' }
+      transition: 'background-color 0.15s ease'
+    }}>
+    <TableCell sx={{ py: 1.5, pl: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Typography
+        sx={{
+          fontWeight: if card.isHeldBy("ANSWER") then 700 else 500
+          color: if card.isHeldBy("ANSWER") then 'primary.main' else 'text.primary'
+        }}>
+        {card.info.name}
+      </Typography>
+      <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+        {card.info.type}
+      </Typography>
+    </TableCell>
+    {
+      for playerId of players
+        <TableCell
+          key={playerId}
+          align="center"
+          sx={{ py: 1.5, px: 1, borderBottom: 1, borderColor: 'divider' }}>
+          <StateElement card={card} player={playerId} />
+        </TableCell>
+    }
+  </TableRow>
 
 Filters = ({ query, onQuery, showOnlyUnknown, onToggleUnknown }) ->
-  <Stack spacing={2} direction={{ xs: 'column', md: 'row' }} sx={{ mb: 2 }}>
+  <Stack
+    spacing={2}
+    direction={{ xs: 'column', sm: 'row' }}
+    alignItems={{ xs: 'stretch', sm: 'center' }}
+    sx={{ mb: 3 }}>
     <TextField
-      label="Search cards"
-      placeholder="Type to filter by name"
+      placeholder="Search cards..."
       value={query}
       onChange={(event) -> onQuery(event.target.value)}
       size="small"
+      InputProps={{
+        startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: 'text.secondary' }} /></InputAdornment>
+      }}
+      sx={{ minWidth: 220 }}
     />
     <Chip
-      label="Only unresolved"
+      label={if showOnlyUnknown then "Showing unresolved only" else "Show unresolved only"}
       color={if showOnlyUnknown then "primary" else "default"}
       variant={if showOnlyUnknown then "filled" else "outlined"}
       onClick={onToggleUnknown}
+      sx={{ fontWeight: 500 }}
     />
   </Stack>
 
@@ -100,18 +160,33 @@ CurrentState = (props) ->
       showOnlyUnknown={showOnlyUnknown}
       onToggleUnknown={() -> setShowOnlyUnknown((state) -> not state)}
     />
-    <Paper variant="outlined" sx={{ overflowX: 'auto' }}>
-      <Grid container>
-        <HeaderRow players={players} app={app} />
-        {<StateRow key={card.id} card={card} players={players} /> for card in filteredCards}
-      </Grid>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{ border: 1, borderColor: 'divider', borderRadius: 3 }}>
+      <Table size="small">
+        <TableHead>
+          <HeaderRow players={players} app={app} />
+        </TableHead>
+        <TableBody>
+          {
+            for card in filteredCards
+              <StateRow
+                key={card.id}
+                card={card}
+                players={players}
+                isHighlight={card.isHeldBy("ANSWER")}
+              />
+          }
+        </TableBody>
+      </Table>
       {
         if filteredCards.length == 0
-          <Box sx={{ p: 2 }}>
-            <Typography color="text.secondary">No cards match your filters. Try clearing the search.</Typography>
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography color="text.secondary">No cards match your filters.</Typography>
           </Box>
       }
-    </Paper>
+    </TableContainer>
   </Box>
 
 export default CurrentState

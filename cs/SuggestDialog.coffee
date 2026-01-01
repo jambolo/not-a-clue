@@ -3,15 +3,39 @@ import PerCategoryCardChooser from './PerCategoryCardChooser'
 import MultiplePlayerChooser from './MultiplePlayerChooser'
 import PlayerChooser from './PlayerChooser'
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import React, { Component } from 'react';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography'
 `
+
+SectionHeader = ({ number, title, subtitle }) ->
+  <Box sx={{ mb: 2 }}>
+    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
+      <Box sx={{
+        width: 28
+        height: 28
+        borderRadius: '50%'
+        bgcolor: 'primary.main'
+        color: 'white'
+        display: 'flex'
+        alignItems: 'center'
+        justifyContent: 'center'
+        fontSize: '0.875rem'
+        fontWeight: 600
+      }}>{number}</Box>
+      <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
+    </Stack>
+    {subtitle and <Typography variant="body2" color="text.secondary" sx={{ ml: 5 }}>{subtitle}</Typography>}
+  </Box>
 
 class SuggestDialog extends Component
   constructor: (props) ->
@@ -136,66 +160,101 @@ class SuggestDialog extends Component
   render: ->
     { open, players, configuration, playerColors } = @props
     <Dialog open={open} fullScreen={true} onClose={@handleClose}>
-      <DialogTitle id="form-dialog-title">Record A Suggestion</DialogTitle>
-      <DialogContent>
-        <Typography variant="h4"> Who made the suggestion? </Typography>
-        <PlayerChooser value={@state.suggesterId} players={players} playerColors={playerColors} onChange={@handleChangeSuggesterId} />
-        <Divider />
-        <Typography variant="h4"> What cards were suggested? </Typography>
-        <PerCategoryCardChooser 
-          value={@state.cardIds} 
-          cards={configuration.cards} 
-          types={configuration.types} 
-          onChange={@handleChangeCards} 
-        />
-        <Divider />
-        {
-          if configuration.rulesId is "master"
-            <div>
-              <Typography variant="h4"> Who showed a card? </Typography>
-              <MultiplePlayerChooser 
-                value={@state.showedIds} 
-                players={players} 
-                playerColors={playerColors}
-                excluded={if @state.suggesterId isnt null then [@state.suggesterId] else []} 
-                onChange={@handleChangeShowedIdsMaster} 
+      <DialogTitle
+        sx={{
+          display: 'flex'
+          alignItems: 'center'
+          justifyContent: 'space-between'
+          borderBottom: 1
+          borderColor: 'divider'
+          py: 2
+          px: 3
+        }}>
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>Record Suggestion</Typography>
+          <Typography variant="body2" color="text.secondary">A suggestion was made during the game</Typography>
+        </Box>
+        <IconButton onClick={@handleCancel} sx={{ color: 'text.secondary' }}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={{ bgcolor: 'background.default', p: { xs: 2, md: 4 } }}>
+        <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Stack spacing={4}>
+            <Box>
+              <SectionHeader number={1} title="Who made the suggestion?" />
+              <PlayerChooser value={@state.suggesterId} players={players} playerColors={playerColors} onChange={@handleChangeSuggesterId} />
+            </Box>
+            <Divider />
+            <Box>
+              <SectionHeader number={2} title="What cards were suggested?" subtitle="Select one card from each category" />
+              <PerCategoryCardChooser
+                value={@state.cardIds}
+                cards={configuration.cards}
+                types={configuration.types}
+                onChange={@handleChangeCards}
               />
-            </div>
-          else
-            <div>
-              <Typography variant="h4"> Who did not have a card? </Typography>
-              <MultiplePlayerChooser 
-                value={@state.didNotShowIds} 
-                players={players} 
-                playerColors={playerColors}
-                excluded={(
-                  if @state.suggesterId isnt null
-                    @state.showedIds.concat([@state.suggesterId])
-                  else 
-                    []
-                )} 
-                onChange={@handleChangeDidNotShowIdsClassic} 
-              />
-              <Typography variant="h4"> Who showed a card? </Typography>
-              <PlayerChooser 
-                value={@state.showedIds[0]} 
-                players={players} 
-                playerColors={playerColors}
-                excluded={(
-                  if @state.suggesterId isnt null 
-                    @state.didNotShowIds.concat([@state.suggesterId]) 
-                  else 
-                    []
-                )} 
-                onChange={@handleChangeShowedIdsClassic} 
-              />
-            </div>
-        }
+            </Box>
+            <Divider />
+            {
+              if configuration.rulesId is "master"
+                <Box>
+                  <SectionHeader number={3} title="Who showed a card?" subtitle="Select all players who showed a card" />
+                  <MultiplePlayerChooser
+                    value={@state.showedIds}
+                    players={players}
+                    playerColors={playerColors}
+                    excluded={if @state.suggesterId isnt null then [@state.suggesterId] else []}
+                    onChange={@handleChangeShowedIdsMaster}
+                  />
+                </Box>
+              else
+                <Stack spacing={4}>
+                  <Box>
+                    <SectionHeader number={3} title="Who did not have a card?" subtitle="Select players who couldn't show anything" />
+                    <MultiplePlayerChooser
+                      value={@state.didNotShowIds}
+                      players={players}
+                      playerColors={playerColors}
+                      excluded={(
+                        if @state.suggesterId isnt null
+                          @state.showedIds.concat([@state.suggesterId])
+                        else
+                          []
+                      )}
+                      onChange={@handleChangeDidNotShowIdsClassic}
+                    />
+                  </Box>
+                  <Divider />
+                  <Box>
+                    <SectionHeader number={4} title="Who showed a card?" subtitle="Select the player who showed a card (if any)" />
+                    <PlayerChooser
+                      value={@state.showedIds[0]}
+                      players={players}
+                      playerColors={playerColors}
+                      excluded={(
+                        if @state.suggesterId isnt null
+                          @state.didNotShowIds.concat([@state.suggesterId])
+                        else
+                          []
+                      )}
+                      onChange={@handleChangeShowedIdsClassic}
+                    />
+                  </Box>
+                </Stack>
+            }
+          </Stack>
+        </Box>
       </DialogContent>
-      <DialogActions>
-        <Button variant="contained" color="primary" onClick={@handleCancel}> Cancel </Button>
-        <Button disabled={not @stateIsOk()} variant="contained" color="primary" onClick={@handleDone}>
-          Done
+      <DialogActions sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider', gap: 1 }}>
+        <Button variant="outlined" onClick={@handleCancel}>Cancel</Button>
+        <Button
+          disabled={not @stateIsOk()}
+          variant="contained"
+          color="primary"
+          onClick={@handleDone}
+          sx={{ px: 4 }}>
+          Record
         </Button>
       </DialogActions>
     </Dialog>

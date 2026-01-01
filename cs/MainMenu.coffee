@@ -2,9 +2,8 @@
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import React, { Component } from 'react';
+import version from './version'
 `
-
-version = require './version'
 
 class MainMenu extends Component
   handleStart: =>

@@ -1,10 +1,9 @@
-`
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
 import Icon from '@mui/material/Icon'
 import InputAdornment from '@mui/material/InputAdornment'
 import Paper from '@mui/material/Paper'
-import React from 'react';
+import React from 'react'
 import SearchIcon from '@mui/icons-material/Search'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
@@ -15,7 +14,6 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-`
 
 Yes = (props) ->
   <Box

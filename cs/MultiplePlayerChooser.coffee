@@ -1,12 +1,10 @@
-`
-import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Paper from '@mui/material/Paper';
-import React, {Component} from 'react';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-`
+import Box from '@mui/material/Box'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Paper from '@mui/material/Paper'
+import React, { Component } from 'react'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 class MultiplePlayerChooser extends Component
 

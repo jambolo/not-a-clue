@@ -1,13 +1,11 @@
-`
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Input from '@mui/material/Input';
-import React from 'react';
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Input from '@mui/material/Input'
+import React from 'react'
 import Typography from '@mui/material/Typography'
-`
 
 ExportDialog = (props) ->
     { open, log, onClose } = props

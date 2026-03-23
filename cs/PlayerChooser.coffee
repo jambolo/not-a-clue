@@ -1,13 +1,11 @@
-`
-import Box from '@mui/material/Box';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Paper from '@mui/material/Paper';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import React from 'react';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-`
+import Box from '@mui/material/Box'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Paper from '@mui/material/Paper'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import React from 'react'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 
 PlayerChoices = (props) ->
   { value, players, excluded, onChange, playerColors } = props

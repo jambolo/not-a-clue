@@ -1,21 +1,19 @@
-`
 import PerCategoryCardChooser from './PerCategoryCardChooser'
 import MultiplePlayerChooser from './MultiplePlayerChooser'
 import PlayerChooser from './PlayerChooser'
 
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import React, { Component } from 'react';
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
+import React, { Component } from 'react'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-`
 
 SectionHeader = ({ number, title, subtitle }) ->
   <Box sx={{ mb: 2 }}>

@@ -1,4 +1,3 @@
-`
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
 import Solver from './Solver'
@@ -12,13 +11,12 @@ import ImportDialog from './ImportDialog'
 import LogDialog from './LogDialog'
 import MainMenu from './MainMenu'
 import MainView from './MainView'
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import SetupDialog from './SetupDialog'
 import ShowDialog from './ShowDialog'
 import SuggestDialog from './SuggestDialog'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { buildPlayerColors, playerColorFor } from './playerColors'
-`
 
 theme = createTheme
   palette:

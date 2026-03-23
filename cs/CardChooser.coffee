@@ -1,13 +1,11 @@
-`
-import AppBar from '@mui/material/AppBar';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import React, { Component } from 'react';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
-`
+import AppBar from '@mui/material/AppBar'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormControl from '@mui/material/FormControl'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import React, { Component } from 'react'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 
 CardChoices = (props) ->
   { value, type, cards, onChange } = props

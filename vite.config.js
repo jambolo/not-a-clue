@@ -1,18 +1,21 @@
-import { defineConfig } from 'vite'
+import { defineConfig, transformWithOxc } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const jsxInJs = {
+  name: 'jsx-in-js',
+  enforce: 'pre',
+  async transform(code, id) {
+    if (/src\/.*\.js$/.test(id)) {
+      return transformWithOxc(code, id, { lang: 'jsx' })
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [react({
-    include: '**/*.{js,jsx,ts,tsx}'
-  })],
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.js$/,
-    exclude: []
-  },
+  plugins: [jsxInJs, react()],
   optimizeDeps: {
-    esbuildOptions: {
-      loader: {
+    rolldownOptions: {
+      moduleTypes: {
         '.js': 'jsx'
       }
     }
@@ -24,15 +27,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-mui': ['@mui/material', '@mui/icons-material']
-        }
-      }
-    }
+    sourcemap: false
   },
   publicDir: 'public'
 })
